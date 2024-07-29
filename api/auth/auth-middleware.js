@@ -45,7 +45,7 @@ const only = role_name => (req, res, next) => {
   */
  const roleName = req.decodedToken.role_name
  if(roleName === role_name){ next()}
- else  return res.json({message:"This is not for you"})
+ else  return res.status(403).json({message:"This is not for you"})
 }
 
 
@@ -60,7 +60,7 @@ const checkUsernameExists = (req, res, next) => {
  const {username} = req.body
  users.findBy(username)
  .then( user => {
-  if(!user){ return res.json({message:"Invalid credentials" })}
+  if(!user){ return res.status(401).json({message:"Invalid credentials" })}
   else 
   next()
  })
@@ -94,7 +94,7 @@ else { role_name = 'student'}
   return res.status(422).json({message: "Role name can not be admin"})
  }
  if(role_name.length > 32){ 
-  return res.json({message:"Role name can not be longer than 32 chars"})
+  return res.status(422).json({message:"Role name can not be longer than 32 chars"})
 }
 else {
   req.body.role_name = role_name

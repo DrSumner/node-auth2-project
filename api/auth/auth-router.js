@@ -20,7 +20,7 @@ router.post("/register", validateRoleName, (req, res, next) => {
   const {username, password, role_name} = req.body
   const hash = bcrypt.hashSync(password, 8)
   users.add({username, password: hash, role_name})
-  .then(user => res.json(user))
+  .then(user => res.status(201).json(user))
   .catch(next)
 });
 
