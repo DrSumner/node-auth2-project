@@ -1,4 +1,5 @@
 const { JWT_SECRET } = require("../secrets"); // use this secret!
+const users = require('../users/users-model')
 
 const restricted = (req, res, next) => {
   /*
@@ -16,6 +17,7 @@ const restricted = (req, res, next) => {
 
     Put the decoded token in the req object, to make life easier for middlewares downstream!
   */
+ next()
 }
 
 const only = role_name => (req, res, next) => {
@@ -29,6 +31,7 @@ const only = role_name => (req, res, next) => {
 
     Pull the decoded token from the req object, to avoid verifying it again!
   */
+ next()
 }
 
 
@@ -40,6 +43,13 @@ const checkUsernameExists = (req, res, next) => {
       "message": "Invalid credentials"
     }
   */
+ const {username} = req.body
+ users.findBy(username)
+ .then( user => {
+  if(!user){ return res.json({message:"Invalid credentials" })}
+  else 
+  next()
+ })
 }
 
 
@@ -62,6 +72,19 @@ const validateRoleName = (req, res, next) => {
       "message": "Role name can not be longer than 32 chars"
     }
   */
+ let {role_name} = req.body
+if(role_name){role_name = role_name.trim()}
+else { role_name = 'student'}
+
+ if(role_name === 'admin'){
+  return res.status(422).json({message: "Role name can not be admin"})
+ }
+ if(role_name.length > 32){ 
+  return res.json({message:"Role name can not be longer than 32 chars"})
+}
+else {
+  req.body.role_name = role_name
+  next()}
 }
 
 module.exports = {
